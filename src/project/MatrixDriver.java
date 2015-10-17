@@ -5,16 +5,23 @@ import java.util.Scanner;
 public class MatrixDriver {
 	
 	public static void main(String[] args) {
-		int size;
-		//Scanner scan = new Scanner(System.in);
-		// TODO Auto-generated method stub
-		try {
-			Matrix a = new Matrix(5);
-			System.out.print(a);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		int size = 0;
+		Scanner scan = new Scanner(System.in);
+		do{
+			System.out.print("Please enter the size of the matrix (must be an integer greater than 0):");
+			if(!scan.hasNextInt()){
+				System.err.println("Integers only please.");
+				scan.next();
+			} else {
+				size = scan.nextInt();
+				if(size < 1){
+					System.err.println("Matrix must be at least 1x1.");
+				} else {
+					break;
+				}
+			}
+		} while(true);
+		Matrix a = new Matrix(size);
+		System.out.print(a);
 	}
 }
