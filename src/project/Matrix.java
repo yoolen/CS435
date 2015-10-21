@@ -20,22 +20,35 @@ public class Matrix{
 	}
 	
 	public void insertNode(Node node){
+		if(node.getR() < 0 || node.getR() >= rowhead.length || node.getC() < 0 || node.getC() >= colhead.length){
+			throw new ArrayIndexOutOfBoundsException();
+		} else if (node.getValue() == 0) {
+			throw new Invalid
+		}
 		Node curr;
 		// start with rows
-		if(rowhead[node.getR()] == null){			// if the head pointer is null (empty list so far)
+		if(rowhead[node.getR()] == null){			// if the head pointer is null (empty row so far)
 			rowhead[node.getR()] = node;			// make the row header for that row point to the
-			node.setNextr(rowhead[node.getR()]);	// node and then point the node back to itself.
+			node.setNextr(node);	// node and then point the node back to itself.
 		} else {
 			curr = rowhead[node.getR()];			// need to traverse the row until at correct location
 			while(curr.getNextr() != rowhead[node.getR()] && node.getC() < curr.getC()){
-				curr = curr.getNextr();
+				curr = curr.getNextr();				// if we reach the end, append to the end
 			}
 			node.setNextr(curr.getNextr());
 			curr.setNextr(node);
 		}
 		// deal with columns
-		if(colhead[node.getC()] == null){
-			
+		if(colhead[node.getC()] == null){			// if the head pointer is null (empty col so far)
+			colhead[node.getC()] = node;
+			node.setNextc(node);
+		} else {
+			curr = colhead[node.getC()];			// need to traverse the row until at correct location
+			while(curr.getNextc() != colhead[node.getC()] && node.getR() < curr.getR()){
+				curr = curr.getNextc();				// if we reach the end, append to the end
+			}
+			node.setNextc(curr.getNextc());
+			curr.setNextc(node);
 		}
 	}
 	
@@ -60,8 +73,8 @@ public class Matrix{
 			while(parser.getNextr() != this.rowhead[i]){
 				array[i][parser.getC()] = parser.getValue();
 				parser = parser.getNextr();
-			}
-			
+			}	
+			array[i][parser.getC()] = parser.getValue();
 		}
 		return array;
 	}

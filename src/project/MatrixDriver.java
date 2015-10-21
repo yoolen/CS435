@@ -22,6 +22,10 @@ public class MatrixDriver {
 			}
 		} while(true);
 		Matrix a = new Matrix(size);
+		Node node = new Node(1,1,1);
+		a.insertNode(node);
+		node = new Node(1,2,3);
+		a.insertNode(node);
 		System.out.print(a);
 	}
 }

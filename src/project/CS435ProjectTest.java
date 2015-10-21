@@ -8,7 +8,7 @@ public class CS435ProjectTest {
 
 	@Test
 	public void testNode() {
-		Node n = new Node(1, 2, 3, null, null);
+		Node n = new Node(1, 2, 3);
 	}
 	
 	@Test

@@ -7,12 +7,12 @@ public class Node {
 	private Node nextr;
 	private Node nextc;
 	
-	public Node(int row, int col, int value, Node nextr, Node nextc){
+	public Node(int row, int col, int value){
 		setRow(row);
 		setCol(col);
 		setValue(value);
-		setNextr(nextr);
-		setNextc(nextc);
+		setNextr(null);
+		setNextc(null);
 	}
 	
 	public int getR() {
