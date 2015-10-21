@@ -17,8 +17,7 @@ public class CS435ProjectTest {
 		Matrix m;
 		try {
 			m = new Matrix(5);
-			assertEquals(m.getColheader().length, 5);
-			assertEquals(m.getRowheader().length, 5);
+			assertEquals(m.getSize(), 5);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
