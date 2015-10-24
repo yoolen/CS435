@@ -68,6 +68,60 @@ public class MatrixDriver {
 		}
 	}
 	
+	public static Matrix subtract(Matrix a, Matrix b){
+		return add(a, scalarMultiply(b, -1));
+	}
+	
+	public static Matrix add(Matrix a, Matrix b){
+		Matrix sum = new Matrix(a.getSize());
+		Node node = null;
+		
+		for(int i = 0; i < sum.getSize(); i++){
+			if(a.getRowhead()[i] == null && b.getRowhead()[i] == null){	// If both null skip to next row
+				continue;
+			} else if(a.getRowhead()[i] == null){	// If the row in A is null just insert all from B
+				node = b.getRowhead()[i];
+				do{					
+					sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
+					node = node.getNextr();
+				} while (node != b.getRowhead()[i]);
+			} else if(b.getRowhead()[i] == null){		// If the row in B is null just insert all from A
+				node = a.getRowhead()[i];
+				do{						
+					sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
+					node = node.getNextr();
+				} while (node != a.getRowhead()[i]);
+			} else {								// Neither is null
+				node = a.getRowhead()[i];
+				do{						
+					sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
+					node = node.getNextr();
+				} while (node != a.getRowhead()[i]);  // is node.getNextr() or just node?	
+				// add nodes from second matrix into sum matrix
+				node = b.getRowhead()[i];
+				do{						
+					sum.addNode(new Node(node.getR(),node.getC(),node.getValue()));
+					node = node.getNextr();				
+				} while (node != b.getRowhead()[i]);
+
+			}
+		}
+		return sum; // return sum matrix
+	}
+	
+	public static Matrix scalarMultiply(Matrix a, int c){
+		Matrix sproduct = new Matrix(a.getSize());
+		for(int i = 0; i < a.getSize(); i++){
+			Node parser = a.getRowhead()[i];
+			if(parser == null){ continue; }
+			while(parser.getNextr() != a.getRowhead()[i]){
+				sproduct.insertNode(new Node(parser.getR(), parser.getC(), parser.getValue() * c));
+				parser = parser.getNextr();
+			}	
+			sproduct.insertNode(new Node(parser.getR(), parser.getC(), parser.getValue() * c));
+		}
+		return sproduct;
+	}
 	
 	public static void main(String[] args) {
 		int size = 0;
@@ -104,5 +158,14 @@ public class MatrixDriver {
 		System.out.println(c);
 		System.out.println("Matrix D:");
 		System.out.println(d);
+		
+		System.out.println("Matrix Add C + D:");
+		System.out.println(add(c,d));
+		
+		System.out.println("Matrix Scalar Multiply D * 5:");
+		System.out.println(scalarMultiply(d, 5));
+		
+		System.out.println("Matrix Subtract C - D:");
+		System.out.println(subtract(c,d));
 	}
 }
