@@ -34,4 +34,11 @@ public class CS435ProjectTest {
 		}
 	}
 
+	public static void testRow(Node row){
+		Node node = row;
+		do{						
+			System.out.println("node: " + node.getValue() + ":" + node + ":" + row + ":" + node.getNextr());
+			node = node.getNextr();
+		} while (node != row);
+	}
 }
