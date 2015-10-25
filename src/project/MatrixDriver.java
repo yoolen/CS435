@@ -5,6 +5,13 @@ import java.util.Scanner;
 public class MatrixDriver {
 	private static Matrix a, b, c, d;
 	
+	public static void initializeByDefault(){
+		Node[] defaultValues = {new Node(0,0,8), new Node(0,2,6), new Node(1,1,7), new Node(1,2,5), new Node(2,0,3), new Node(3,3,9)};
+		for(Node node: defaultValues){
+			a.insertNode(node);
+		}
+	}
+	
 	public static void initializeByInput(){
 		Scanner scanner = new Scanner(System.in);
 		String input, inputarray[] = null;
@@ -69,7 +76,7 @@ public class MatrixDriver {
 	}
 	
 	public static Matrix subtract(Matrix a, Matrix b){
-		return add(a, scalarMultiply(b, -1));
+		return add(a, scalarMultiply(-1, b));
 	}
 	
 	public static Matrix add(Matrix a, Matrix b){
@@ -109,7 +116,7 @@ public class MatrixDriver {
 		return sum; // return sum matrix
 	}
 	
-	public static Matrix scalarMultiply(Matrix a, int c){
+	public static Matrix scalarMultiply(int c, Matrix a){
 		Matrix sproduct = new Matrix(a.getSize());
 		for(int i = 0; i < a.getSize(); i++){
 			Node parser = a.getRowhead()[i];
@@ -126,28 +133,40 @@ public class MatrixDriver {
 	public static void main(String[] args) {
 		int size = 0;
 		Scanner scan = new Scanner(System.in);
-		do{
-			System.out.print("Please enter the size of the matrix (must be an integer greater than 0):");
-			if(!scan.hasNextInt()){
-				System.out.println("Integers only please.");
-				scan.next();
-			} else {
-				size = scan.nextInt();
-				if(size < 1){
-					System.out.println("Matrix must be at least 1x1.");
+		boolean input = false; // toggle this to enable user input
+		
+		if(input){
+			do{
+				System.out.print("Please enter the size of the matrix (must be an integer greater than 0):");
+				if(!scan.hasNextInt()){
+					System.out.println("Integers only please.");
+					scan.next();
 				} else {
-					break;
+					size = scan.nextInt();
+					if(size < 1){
+						System.out.println("Matrix must be at least 1x1.");
+					} else {
+						break;
+					}
 				}
-			}
-		} while(true);
+			} while(true);	
+		} else {
+			size = 4;
+		}
+		
 		a = new Matrix(size);
 		b = new Matrix(size);
 		c = new Matrix(size);
 		d = new Matrix(size);
 		
+		// Part I deliverables
 		// Initialize the Matrices
 		initializeByFormula();
-		initializeByInput();
+		if(input){
+			initializeByInput();
+		} else {
+			initializeByDefault();
+		}
 		
 		// Print out the tables;
 		System.out.println("Matrix A:");
@@ -159,13 +178,55 @@ public class MatrixDriver {
 		System.out.println("Matrix D:");
 		System.out.println(d);
 		
-		System.out.println("Matrix Add C + D:");
-		System.out.println(add(c,d));
 		
-		System.out.println("Matrix Scalar Multiply D * 5:");
-		System.out.println(scalarMultiply(d, 5));
+		// Part II deliverables
+		Matrix e, f, g, h, i, j, k, l, m, n, o, p;
+		System.out.println("Matrix E = B + D:");
+		e = add(b,d);
+		System.out.println(e);
 		
-		System.out.println("Matrix Subtract C - D:");
-		System.out.println(subtract(c,d));
+		System.out.println("Matrix F = D - C:");
+		f = subtract(d, c);
+		System.out.println(f);
+		
+		System.out.println("Matrix G = A + B:");
+		g = add(a, b);
+		System.out.println(g);
+		
+		System.out.println("Matrix H = A - B:");
+		h = subtract(a, b);
+		System.out.println(h);
+				
+		System.out.println("Matrix I = E - F:");
+		i = subtract(e, f);
+		System.out.println(i);
+		
+		System.out.println("Matrix J = G + H:");
+		j = add(g, h);
+		System.out.println(j);
+		
+		System.out.println("Matrix K = 5 * B:");
+		k = scalarMultiply(5, b);
+		System.out.println(k);
+		
+		System.out.println("Matrix L = 8 * C:");
+		l = scalarMultiply(8, c);
+		System.out.println(l);
+		
+		System.out.println("Matrix M = 3 * G:");
+		m = scalarMultiply(3, g);
+		System.out.println(m);
+		
+		System.out.println("Matrix N = 2 * H:");
+		n = scalarMultiply(2, h);
+		System.out.println(n);
+		
+		System.out.println("Matrix O = 2 * M:");
+		o = scalarMultiply(2, m);
+		System.out.println(o);
+		
+		System.out.println("Matrix P = 3 * F:");
+		p = scalarMultiply(3, f);
+		System.out.println(p);
 	}
 }
