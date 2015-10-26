@@ -130,6 +130,21 @@ public class MatrixDriver {
 		return sproduct;
 	}
 	
+	public static Matrix transpose(Matrix a){
+		Matrix atrans = new Matrix(a.getSize());
+		Node traverse = null;
+		for(int i = 0; i < a.getSize(); i++){
+			Node parser = a.getRowhead()[i];
+			if(parser == null){ continue; }
+			while(parser.getNextr() != a.getRowhead()[i]){
+				atrans.insertNode(new Node(parser.getC(), parser.getR(), parser.getValue()));
+				parser = parser.getNextr();
+			}	
+			atrans.insertNode(new Node(parser.getC(), parser.getR(), parser.getValue()));
+		}
+		return atrans;
+	}
+	
 	public static void main(String[] args) {
 		int size = 0;
 		Scanner scan = new Scanner(System.in);
@@ -228,5 +243,10 @@ public class MatrixDriver {
 		System.out.println("Matrix P = 3 * F:");
 		p = scalarMultiply(3, f);
 		System.out.println(p);
+		
+		// Part III deliverables
+		System.out.println("Matrix Q = A^T");
+		Matrix q = transpose(a);
+		System.out.println(q);
 	}
 }
