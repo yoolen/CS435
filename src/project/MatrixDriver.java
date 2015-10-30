@@ -159,12 +159,45 @@ public class MatrixDriver {
 		return atrans;
 	}
 	
-	public static int vectorMultiply(Node a, Node b){
-		//	Because the column and row vectors are linked lists, we can use some specific behaviours to simplify
-		// the process of generating
-		int product = 0;
-		
-		return product;
+	public static int vectorMultiply(Node rowa, Node colb){
+		// Because the column and row vectors are linked lists, we can use some specific behaviours to simplify
+		// the process of calculating the sum of the products in a vector multiplication. A vector product requires
+		// that both vectors be the same size; we then multiply the respective elements and add these products
+		// together to get the vector product. 
+		//  To do this we traverse the two vectors (which are implemented as lists) using 2 traversal nodes. Initial 
+		// two traversal nodes to the heads of each vector, and then compare the column value of the node of row a 
+		// to the row value of the node of column b. If either value is smaller than the other, that means that the
+		// corresponding vector with the larger value has values of 0 for all values before that node (and multiplying
+		// anything by 0 results in 0), so we simply go to the next node in the smaller of the two vectors. If the
+		// column and row values are equal then we have found a non-zero product; multiply these two and add it to the
+		// sum and then increment both traversal nodes and repeat.
+		int sum = 0;
+		Node trava = rowa, travb = colb;
+		while(trava.getNextr() != rowa && travb.getNextc() != colb){	// only need to go until we've reached the end of one vector
+			if(trava.getC() == travb.getR()){	// Column from row vector and row from column vector match up so we can multiply
+				sum += trava.getValue() * travb.getValue();
+				trava = trava.getNextr();		// increment both by 1 node
+				travb = travb.getNextc();
+				continue;
+			} else if (trava.getC() < travb.getR()){	// column value of the row vector is less, so corresponding element in  
+				trava = trava.getNextr();				// column vector must have been a 0 (not inserted into the vector per 
+				continue;								// our implementation) so increment by 1 node and check again
+			} else {									// Last possibility is that value of the row in the column vector is less
+				travb = travb.getNextc();				// than the column value of the row vector so we increment that by 1 node
+				continue;
+			}
+		}	// if at any time either the row or column vector has reached the end (looped around) we exit the while loop
+			// this leaves the last nodes unchecked, so we must do the following processing:
+		if(trava.getNextr() == rowa && travb.getNextc() == colb){	// if both ended at the same time just check to see if 
+			if(trava.getC() == travb.getR()){						// they are corresponding nodes that need to be multiplied
+				sum += trava.getValue() * travb.getValue();			// and either do it or don't
+			}
+		} else if (trava.getNextr() == rowa){		// only one node left in the row vector so check against column vector 
+			
+		} else {									// only one node left in the column vector so check against the row vector
+			
+		}
+		return sum;
 	}
 
 	public static Matrix multiply(Matrix a, Matrix b){
