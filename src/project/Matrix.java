@@ -153,7 +153,7 @@ public class Matrix{
 			for(int i = 0; i < size; i++){
 				output += "[";
 				for(int j = 0; j < size; j++){
-					output += String.format("%5d", array[i][j]);
+					output += String.format("%8d", array[i][j]);
 				}
 				output += "  ]\n";
 			}
@@ -169,7 +169,7 @@ public class Matrix{
 			for(int i = 0; i < size; i++){
 				output += "[";
 				for(int j = 0; j < size; j++){
-					output += String.format("%5d", array[i][j]);
+					output += String.format("%8d", array[i][j]);
 				}
 				output += "  ]\n";
 			}
