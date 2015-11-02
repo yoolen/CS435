@@ -1,9 +1,22 @@
 package project;
 
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class MatrixDriver {
 	private static Matrix a, b, c, d;
+	
+	public static Matrix identityMatrix(int size){
+		Matrix identity = new Matrix(size);
+		for(int i = 0; i < size; i++){
+			for(int j = 0; j < size; j++){
+				if(i == j){
+					identity.insertNode(new Node(i, j, 1));
+				}
+			}
+		}
+		return identity;
+	}
 
 	public static void initializeByDefault(){
 		// Initializes matrix A to default values as specified, it does this by creating 
@@ -172,6 +185,9 @@ public class MatrixDriver {
 		// column and row values are equal then we have found a non-zero product; multiply these two and add it to the
 		// sum and then increment both traversal nodes and repeat.
 		int sum = 0;
+		if(rowa == null || colb == null){ // if either row or column is null the product will be 0
+			return 0;
+		}
 		Node trava = rowa, travb = colb;
 		while(trava.getNextr() != rowa && travb.getNextc() != colb){	// only need to go until we've reached the end of one vector
 			if(trava.getC() == travb.getR()){	// Column from row vector and row from column vector match up so we can multiply
@@ -192,10 +208,28 @@ public class MatrixDriver {
 			if(trava.getC() == travb.getR()){						// they are corresponding nodes that need to be multiplied
 				sum += trava.getValue() * travb.getValue();			// and either do it or don't
 			}
-		} else if (trava.getNextr() == rowa){		// only one node left in the row vector so check against column vector 
-			
+		} else if (trava.getNextr() == rowa){			// only one node left in the row vector so check against column vector 
+			while(travb.getC() < trava.getR()){			// loop through column vector until we're at either > or the end
+				if(travb.getNextc() == colb){			// if we're already at the end then stop looping
+					break;
+				} else {
+					travb = travb.getNextc();
+				}
+			}
+			if(trava.getC() == travb.getR()){		// if we've reached the end of the column vector check to see if we found
+				sum += trava.getValue() * travb.getValue();	// a corresponding row/column.
+			}	
 		} else {									// only one node left in the column vector so check against the row vector
-			
+			while(trava.getR() < travb.getC()){
+				if(trava.getNextr() == rowa){
+					break;
+				} else {
+					trava = trava.getNextr();
+				}
+			}
+			if(trava.getC() == travb.getR()){		// if we've reached the end of the column vector check to see if we found
+				sum += trava.getValue() * travb.getValue();	// a corresponding row/column.
+			}
 		}
 		return sum;
 	}
@@ -210,8 +244,22 @@ public class MatrixDriver {
 		// a null row or column is detected we automatically know the value of the matrix at (row,col) will be 0). 
 		//  A helper function vectorMultiply is used to calculate the value of the node to be inserted. 
 		Matrix product = new Matrix(a.getSize());
-
+		for(int i = 0; i < a.getSize(); i++){
+			for(int j = 0; j < b.getSize(); j++){
+				product.insertNode(new Node(i, j, vectorMultiply(a.getRowhead()[i], b.getColhead()[j])));
+			}
+		}
 		return product;
+	}
+	
+	public static Matrix power(Matrix a, int exp){
+		if(exp == 0){
+			return identityMatrix(a.getSize());
+		}
+		if(exp == 1){	// base case is exponent of 1, just return original matrix
+			return a;
+		}
+		return multiply(power(a, (int)(exp/2)), power(a, exp - (int)(exp/2))); // otherwise break the exponent into two halves 
 	}
 
 	public static void main(String[] args) {
@@ -327,8 +375,85 @@ public class MatrixDriver {
 		System.out.println(p);
 
 		// Part III deliverables
-		System.out.println("Matrix Q = A^T");
-		Matrix q = transpose(a);
+		Matrix q, r, s, t, u, v, w, x, y, z, aa, ab, ac, ad, ae, af, ag, ah, ai, aj;
+		System.out.println("Matrix Q = A * B:");
+		q = multiply(a, b);
 		System.out.println(q);
+		
+		System.out.println("Matrix R = B * D:");
+		r = multiply(b, d);
+		System.out.println(r);
+		
+		System.out.println("Matrix S = E * G:");
+		s = multiply(e, g);
+		System.out.println(s);
+		
+		System.out.println("Matrix T = G * E:");
+		t = multiply(g, e);
+		System.out.println(t);
+		
+		System.out.println("Matrix U = Q * H:");
+		u = multiply(q, h);
+		System.out.println(u);
+		
+		System.out.println("Matrix V = S * T:");
+		v = multiply(s, t);
+		System.out.println(v);
+		
+		System.out.println("Matrix W = R * S:");
+		w = multiply(r, s);
+		System.out.println(w);
+		
+		System.out.println("Matrix X = D ^ 5:");
+		x = power(d, 5);
+		System.out.println(x);
+		
+		System.out.println("Matrix Y = C ^ 8:");
+		y = power(c, 8);
+		System.out.println(y);
+		
+		System.out.println("Matrix Z = B ^ 10:");
+		z = power(b, 10);
+		System.out.println(z);
+		
+		System.out.println("Matrix AA = F ^ 2:");
+		aa = power(f, 2);
+		System.out.println(aa);
+		
+		System.out.println("Matrix AB = C ^ 3:");
+		ab = power(c, 3);
+		System.out.println(ab);
+		
+		System.out.println("Matrix AC = A ^ 4:");
+		ac = power(a, 4);
+		System.out.println(ac);
+		
+		System.out.println("Matrix AD = E ^ 3:");
+		ad = power(e, 3);
+		System.out.println(ad);
+		
+		System.out.println("Matrix AE = F ^ T:");
+		ae = transpose(f);
+		System.out.println(ae);
+		
+		System.out.println("Matrix AF = E ^ T:");
+		af = transpose(e);
+		System.out.println(af);
+		
+		System.out.println("Matrix AG = V ^ T:");
+		ag = transpose(v);
+		System.out.println(ag);
+		
+		System.out.println("Matrix AH = L ^ T:");
+		ah = transpose(l);
+		System.out.println(ah);
+		
+		System.out.println("Matrix AI = ((A + B) ^ T) - (A ^ T) - (B ^ T):");
+		ai = subtract(subtract(transpose(add(a, b)), transpose(a)), transpose(b));
+		System.out.println(ai);
+		
+		System.out.println("Matrix AJ = ((A * B) ^ T) - ((B ^ T) * (A ^ T)):");
+		aj = subtract(transpose(multiply(a,b)), multiply(transpose(b), transpose(a)));
+		System.out.println(aj);
 	}
 }
