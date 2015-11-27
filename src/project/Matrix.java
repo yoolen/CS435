@@ -26,7 +26,7 @@ public class Matrix{
 	}
 	
 
-	public void addNode(Node node){
+/*	public void addNode(Node node){
 		if (node.getValue() == 0) {
 			// do nothing
 		} else {
@@ -40,7 +40,8 @@ public class Matrix{
 				while(curr.getNextr() != rowhead[node.getR()] && curr.getC() < node.getC()){
 					curr = curr.getNextr();				// if we reach the end, append to the end
 				}
-				if(curr.getC()==node.getC()){ 			// if duplicate location is found then we add the
+				if(curr.getNextr().getC()==node.getC()){ 	// if duplicate location is found then we check if the sum is 0
+					if(curr.getNextr().getValue() + node.getValue() == 0){	// remove the node
 					curr.setValue(curr.getValue() + node.getValue()); 	// value of the current node to that of the inserted
 					node = null;						// node and clear the node
 				} else {
@@ -58,7 +59,7 @@ public class Matrix{
 					node.setNextc(node);
 				} else {
 					curr = colhead[node.getC()];			// need to traverse the row until at correct location
-					while(curr.getNextc() != colhead[node.getC()] && node.getR() < curr.getR()){
+					while(curr.getNextc() != colhead[node.getC()] && curr.getR() < node.getR()){
 						curr = curr.getNextc();				// if we reach the end, append to the end
 					}
 					node.setNextc(curr.getNextc());
@@ -66,7 +67,7 @@ public class Matrix{
 				}
 			}
 		} 
-	}
+	}*/
 
 	public void insertNode(Node node){
 		if (node.getValue() == 0) {
@@ -143,7 +144,22 @@ public class Matrix{
 		return array;
 	}
 
-
+	public String toStringByCol(){
+		int[][] array = this.Matrix2Arraybycol();
+		String output = "";
+		if(array == null){ output = "Empty array"; }
+		else{
+			for(int i = 0; i < size; i++){
+				output += "[";
+				for(int j = 0; j < size; j++){
+					output += String.format("%8d", array[i][j]);
+				}
+				output += "  ]\n";
+			}
+		}
+		return output;
+	}
+	
 	@Override
 	public String toString(){ // Print method
 		int[][] array = this.Matrix2Array();
