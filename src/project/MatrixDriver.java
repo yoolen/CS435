@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class MatrixDriver {
 	private static Matrix a, b, c, d;
-	
+
 	public static Matrix identityMatrix(int size){
 		Matrix identity = new Matrix(size);
 		for(int i = 0; i < size; i++){
@@ -23,7 +23,9 @@ public class MatrixDriver {
 		// an array of the nodes with default values and then inserting them into the matrix
 		Node[] defaultValues = {new Node(0,0,8), new Node(0,2,6), new Node(1,1,7), new Node(1,2,5), new Node(2,0,3), new Node(3,3,9)};
 		for(Node node: defaultValues){
-			a.insertNode(node);
+			if(node.getR() < a.getSize() && node.getC() < a.getSize()){
+				a.insertNode(node);
+			}
 		}
 	}
 
@@ -34,6 +36,7 @@ public class MatrixDriver {
 		Scanner scanner = new Scanner(System.in);
 		String input, inputarray[] = null;
 		Node node = null;
+		a = new Matrix(a.getSize());
 		System.out.println("Initializing your matrix by input...");
 		while(true){
 			System.out.print("Please enter an element as a 3-tuple consisting of row, column, value (ie. 1 1 3) or -1 to exit:");
@@ -74,6 +77,7 @@ public class MatrixDriver {
 	}
 
 	public static void initializeByFormula(){
+		initializeByDefault();
 		// generate Matrices using formulas
 		for(int i = 0; i < b.getSize(); i++){
 			for(int j = 0; j < b.getSize(); j++){
@@ -99,11 +103,11 @@ public class MatrixDriver {
 	}
 
 	public static Matrix add(Matrix a, Matrix b){
-		// Addition is done by creating a new matrix and inserting copies of the nodes from the first matrix
-		// and then adding the values from the second matrix (either as new nodes or by updating the values
-		// in the new matrix).
+		// Addition is done by creating a new matrix the calculating the sums of respective nodes
+		// in the two matrices and then creating a new node with that sum and inserting into the
+		// sum matrix which is returned once fully populated.
 		Matrix sum = new Matrix(a.getSize());
-		Node node = null;
+		Node node = null, node2 = null;
 
 		for(int i = 0; i < sum.getSize(); i++){
 			if(a.getRowhead()[i] == null && b.getRowhead()[i] == null){	// If both null skip to next row
@@ -120,20 +124,62 @@ public class MatrixDriver {
 					sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
 					node = node.getNextr();
 				} while (node != a.getRowhead()[i]);
-			} else {								// Neither is null
+			} else {	// Neither is null so we have to do some math
 				node = a.getRowhead()[i];
-				do{						
-					sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
-					node = node.getNextr();
-				} while (node != a.getRowhead()[i]);  // is node.getNextr() or just node?	
-				// add nodes from second matrix into sum matrix
-				node = b.getRowhead()[i];
-				do{						
-					sum.addNode(new Node(node.getR(),node.getC(),node.getValue()));
-					node = node.getNextr();				
-				} while (node != b.getRowhead()[i]);
-
-			}
+				node2 = b.getRowhead()[i];
+				do{
+					if(node.getC() == node2.getC()){ // if the two nodes are aligned add and insert
+						int addnodes = node.getValue() + node2.getValue();
+						sum.insertNode(new Node(node.getR(),node.getC(),addnodes));
+						node = node.getNextr();
+						if(node == a.getRowhead()[i]){ // insert the rest of b if we've run out of a nodes
+							if(node2.getNextr() == b.getRowhead()[i]){
+								break;
+							}
+							while(node2.getNextr() != b.getRowhead()[i]){
+								sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+								node2 = node2.getNextr();
+							}
+							sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+							break;
+						}
+						node2 = node2.getNextr();
+						if(node2 == b.getRowhead()[i]){ // insert the rest of b if we've run out of a nodes
+							if(node.getNextr() == a.getRowhead()[i]){
+								break;
+							}
+							while(node.getNextr() != a.getRowhead()[i]){
+								sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
+								node = node.getNextr();
+							}
+							sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
+							break;
+						}
+					} else if(node.getC() < node2.getC()){ // if not aligned, it means that the respective node in the other matrix is 0 
+						sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
+						node = node.getNextr(); // traverse further on the row of the first matrix
+						if(node == a.getRowhead()[i]){ // insert the rest of b if we've run out of a nodes
+							while(node2.getNextr() != b.getRowhead()[i]){
+								sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+								node2 = node2.getNextr();
+							}
+							sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+							break;
+						}
+					} else if(node2.getC() < node.getC()){
+						sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+						node2 = node2.getNextr(); // traverse further on the row of the second matrix
+						if(node2 == b.getRowhead()[i]){ // insert the rest of b if we've run out of a nodes
+							while(node.getNextr() != a.getRowhead()[i]){
+								sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
+								node = node.getNextr();
+							}
+							sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
+							break;
+						}
+					} 
+				} while(node != a.getRowhead()[i] || node2 != b.getRowhead()[i]);
+			}	
 		}
 		return sum; // return sum matrix
 	}
@@ -171,7 +217,7 @@ public class MatrixDriver {
 		}
 		return atrans;
 	}
-	
+
 	public static int vectorMultiply(Node rowa, Node colb){
 		// Because the column and row vectors are linked lists, we can use some specific behaviours to simplify
 		// the process of calculating the sum of the products in a vector multiplication. A vector product requires
@@ -189,48 +235,41 @@ public class MatrixDriver {
 			return 0;
 		}
 		Node trava = rowa, travb = colb;
-		while(trava.getNextr() != rowa && travb.getNextc() != colb){	// only need to go until we've reached the end of one vector
+		//System.out.printf("Row:%d Col:%d!\n", rowa.getR(), colb.getC());
+		loop: {
+			do{
+				if(trava.getNextr() == rowa && travb.getNextc() == colb){	// this is done to handle 1x1 matrices; do one
+					//System.out.println("Found the end!");
+					break;													// addition after the vector is processed for
+				}															// the final 2 nodes.
+				if(trava.getC() == travb.getR()){	// Column from row vector and row from column vector match up so we can multiply
+					sum += trava.getValue() * travb.getValue();
+					//System.out.println("Equal! Sum:" + sum);
+					if(trava.getNextr() != rowa && travb.getNextc() != colb){
+						trava = trava.getNextr();		// increment both by 1 node
+						travb = travb.getNextc();
+						//System.out.println("Moved both up!");
+					} else {
+						//System.out.println("Internal Break!");
+						break loop;
+					}
+				} else if (trava.getC() < travb.getR() && trava.getNextr() != rowa){	// column value of the row vector is less, so corresponding element in
+					trava = trava.getNextr();									// column vector must have been a 0 (not inserted into the vector per 
+					//System.out.println("Moved a up!");															// our implementation) so increment by 1 node and check again
+				} else if (travb.getR() < trava.getC() && travb.getNextc() != colb){	// Only other possibility is that value of the row in the column vector is less
+					travb = travb.getNextc();									// than the column value of the row vector so we increment that by 1 node
+					//System.out.println("Moved b up!");
+				} else {
+					//System.out.println("Break!");
+					break;
+				} 
+			} while(trava.getNextr() != rowa || travb.getNextc() != colb);
 			if(trava.getC() == travb.getR()){	// Column from row vector and row from column vector match up so we can multiply
 				sum += trava.getValue() * travb.getValue();
-				trava = trava.getNextr();		// increment both by 1 node
-				travb = travb.getNextc();
-				continue;
-			} else if (trava.getC() < travb.getR()){	// column value of the row vector is less, so corresponding element in  
-				trava = trava.getNextr();				// column vector must have been a 0 (not inserted into the vector per 
-				continue;								// our implementation) so increment by 1 node and check again
-			} else {									// Last possibility is that value of the row in the column vector is less
-				travb = travb.getNextc();				// than the column value of the row vector so we increment that by 1 node
-				continue;
-			}
-		}	// if at any time either the row or column vector has reached the end (looped around) we exit the while loop
-			// this leaves the last nodes unchecked, so we must do the following processing:
-		if(trava.getNextr() == rowa && travb.getNextc() == colb){	// if both ended at the same time just check to see if 
-			if(trava.getC() == travb.getR()){						// they are corresponding nodes that need to be multiplied
-				sum += trava.getValue() * travb.getValue();			// and either do it or don't
-			}
-		} else if (trava.getNextr() == rowa){			// only one node left in the row vector so check against column vector 
-			while(travb.getC() < trava.getR()){			// loop through column vector until we're at either > or the end
-				if(travb.getNextc() == colb){			// if we're already at the end then stop looping
-					break;
-				} else {
-					travb = travb.getNextc();
-				}
-			}
-			if(trava.getC() == travb.getR()){		// if we've reached the end of the column vector check to see if we found
-				sum += trava.getValue() * travb.getValue();	// a corresponding row/column.
+				//System.out.println("Equal at the end! Sum:" + sum);
 			}	
-		} else {									// only one node left in the column vector so check against the row vector
-			while(trava.getR() < travb.getC()){
-				if(trava.getNextr() == rowa){
-					break;
-				} else {
-					trava = trava.getNextr();
-				}
-			}
-			if(trava.getC() == travb.getR()){		// if we've reached the end of the column vector check to see if we found
-				sum += trava.getValue() * travb.getValue();	// a corresponding row/column.
-			}
-		}
+		}	
+		//System.out.println("At the end!\n");
 		return sum;
 	}
 
@@ -251,7 +290,7 @@ public class MatrixDriver {
 		}
 		return product;
 	}
-	
+
 	public static Matrix power(Matrix a, int exp){
 		if(exp == 0){
 			return identityMatrix(a.getSize());
@@ -268,7 +307,7 @@ public class MatrixDriver {
 		String input;
 		boolean choice = false;
 
-		do{
+		/*		do{
 			System.out.print("Would you like to manually initialize the matrix: y/n (n for default values)? ");
 			input = scan.nextLine();
 			if(input.length() > 1 || !input.equals("y") && !input.equals("n")){
@@ -280,24 +319,23 @@ public class MatrixDriver {
 				}
 				break;
 			}
-		} while (true);
+		} while (true);*/
 
-		if(choice){	
-			do{
-				System.out.print("Please enter the size of the matrix (must be an integer greater than 0):");
-				if(!scan.hasNextInt()){
-					System.out.println("Integers only please.");
-					scan.next();
+		do{
+			System.out.print("Please enter the size of the matrix (must be an integer greater than 0):");
+			if(!scan.hasNextInt()){
+				System.out.println("Integers only please.");
+				scan.next();
+			} else {
+				size = scan.nextInt();
+				if(size < 1){
+					System.out.println("Matrix must be at least 1x1.");
 				} else {
-					size = scan.nextInt();
-					if(size < 1){
-						System.out.println("Matrix must be at least 1x1.");
-					} else {
-						break;
-					}
+					break;
 				}
-			} while(true);
-		}
+			}
+		} while(true);
+
 
 		a = new Matrix(size);
 		b = new Matrix(size);
@@ -307,11 +345,7 @@ public class MatrixDriver {
 		// Part I deliverables
 		// Initialize the Matrices
 		initializeByFormula();
-		if(choice){
-			initializeByInput();
-		} else {
-			initializeByDefault();
-		}
+
 
 		// Print out the tables;
 		System.out.println("Matrix A:");
@@ -322,7 +356,6 @@ public class MatrixDriver {
 		System.out.println(c);
 		System.out.println("Matrix D:");
 		System.out.println(d);
-
 
 		// Part II deliverables
 		Matrix e, f, g, h, i, j, k, l, m, n, o, p;
@@ -379,81 +412,114 @@ public class MatrixDriver {
 		System.out.println("Matrix Q = A * B:");
 		q = multiply(a, b);
 		System.out.println(q);
-		
+
 		System.out.println("Matrix R = B * D:");
 		r = multiply(b, d);
 		System.out.println(r);
-		
+
 		System.out.println("Matrix S = E * G:");
 		s = multiply(e, g);
 		System.out.println(s);
-		
+
 		System.out.println("Matrix T = G * E:");
 		t = multiply(g, e);
 		System.out.println(t);
-		
+
 		System.out.println("Matrix U = Q * H:");
 		u = multiply(q, h);
 		System.out.println(u);
-		
+
 		System.out.println("Matrix V = S * T:");
 		v = multiply(s, t);
 		System.out.println(v);
-		
+
 		System.out.println("Matrix W = R * S:");
 		w = multiply(r, s);
 		System.out.println(w);
-		
+
 		System.out.println("Matrix X = D ^ 5:");
 		x = power(d, 5);
 		System.out.println(x);
-		
+
 		System.out.println("Matrix Y = C ^ 8:");
 		y = power(c, 8);
 		System.out.println(y);
-		
+
 		System.out.println("Matrix Z = B ^ 10:");
 		z = power(b, 10);
 		System.out.println(z);
-		
+
 		System.out.println("Matrix AA = F ^ 2:");
 		aa = power(f, 2);
 		System.out.println(aa);
-		
+		System.out.println(aa.toStringByCol());
+
 		System.out.println("Matrix AB = C ^ 3:");
 		ab = power(c, 3);
 		System.out.println(ab);
-		
+
 		System.out.println("Matrix AC = A ^ 4:");
 		ac = power(a, 4);
 		System.out.println(ac);
-		
+
 		System.out.println("Matrix AD = E ^ 3:");
 		ad = power(e, 3);
 		System.out.println(ad);
-		
+
 		System.out.println("Matrix AE = F ^ T:");
 		ae = transpose(f);
 		System.out.println(ae);
-		
+
 		System.out.println("Matrix AF = E ^ T:");
 		af = transpose(e);
 		System.out.println(af);
-		
+
 		System.out.println("Matrix AG = V ^ T:");
 		ag = transpose(v);
 		System.out.println(ag);
-		
+
 		System.out.println("Matrix AH = L ^ T:");
 		ah = transpose(l);
 		System.out.println(ah);
-		
+
 		System.out.println("Matrix AI = ((A + B) ^ T) - (A ^ T) - (B ^ T):");
 		ai = subtract(subtract(transpose(add(a, b)), transpose(a)), transpose(b));
 		System.out.println(ai);
-		
+
 		System.out.println("Matrix AJ = ((A * B) ^ T) - ((B ^ T) * (A ^ T)):");
 		aj = subtract(transpose(multiply(a,b)), multiply(transpose(b), transpose(a)));
 		System.out.println(aj);
+
+		initializeByInput();
+		System.out.println(a);
+	}
+
+	public static void printList(Matrix a){
+		System.out.println("rows");
+		for(int bullshit = 0; bullshit < a.getSize(); bullshit++){
+			Node test = a.getRowhead()[bullshit];
+			if(test != null){
+				while(test.getNextr() != a.getRowhead()[bullshit]){
+					System.out.print(test.getValue() + " ");
+					test = test.getNextr();
+				}
+				System.out.println(test.getValue());
+			} else {
+				System.out.println("nothing here");
+			}
+		}
+		System.out.println("columns");
+		for(int bullshit = 0; bullshit < a.getSize(); bullshit++){
+			Node test = a.getColhead()[bullshit];
+			if(test != null){
+				while(test.getNextc() != a.getColhead()[bullshit]){
+					System.out.print(test.getValue() + " ");
+					test = test.getNextc();
+				}
+				System.out.println(test.getValue());
+			} else {
+				System.out.println("nothing here");
+			}
+		}
 	}
 }
