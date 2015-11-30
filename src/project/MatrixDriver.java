@@ -107,78 +107,86 @@ public class MatrixDriver {
 		// in the two matrices and then creating a new node with that sum and inserting into the
 		// sum matrix which is returned once fully populated.
 		Matrix sum = new Matrix(a.getSize());
-		Node node = null, node2 = null;
+		Node node1 = null, node2 = null;
 
-		for(int i = 0; i < sum.getSize(); i++){
+		for(int i = 0; i < sum.getSize(); i++){ // this goes row by row adding up the matrices
 			if(a.getRowhead()[i] == null && b.getRowhead()[i] == null){	// If both null skip to next row
 				continue;
 			} else if(a.getRowhead()[i] == null){	// If the row in A is null just insert all from B
-				node = b.getRowhead()[i];
+				node1 = b.getRowhead()[i];
 				do{					
-					sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
-					node = node.getNextr();
-				} while (node != b.getRowhead()[i]);
+					sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
+					node1 = node1.getNextr();
+				} while (node1 != b.getRowhead()[i]);
 			} else if(b.getRowhead()[i] == null){		// If the row in B is null just insert all from A
-				node = a.getRowhead()[i];
+				node1 = a.getRowhead()[i];
 				do{						
-					sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
-					node = node.getNextr();
-				} while (node != a.getRowhead()[i]);
-			} else {	// Neither is null so we have to do some math
-				node = a.getRowhead()[i];
+					sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
+					node1 = node1.getNextr();
+				} while (node1 != a.getRowhead()[i]);
+			} else {	// Neither is null so we have to do some processing
+				node1 = a.getRowhead()[i];
 				node2 = b.getRowhead()[i];
-				do{
-					if(node.getC() == node2.getC()){ // if the two nodes are aligned add and insert
-						int addnodes = node.getValue() + node2.getValue();
-						sum.insertNode(new Node(node.getR(),node.getC(),addnodes));
-						node = node.getNextr();
-						if(node == a.getRowhead()[i]){ // insert the rest of b if we've run out of a nodes
-							if(node2.getNextr() == b.getRowhead()[i]){
-								break;
-							}
-							while(node2.getNextr() != b.getRowhead()[i]){
-								sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
-								node2 = node2.getNextr();
-							}
-							sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
-							break;
-						}
+				// Precondition: neither row is null or single element
+				// Postcondition: at least 1 row will be at its final element
+				while(node1.getNextr() != a.getRowhead()[i] && node2.getNextr() != b.getRowhead()[i]){
+					if(node1.getC() == node2.getC()){ // if the two nodes are aligned add and insert
+						int addnodes = node1.getValue() + node2.getValue();
+						sum.insertNode(new Node(node1.getR(),node1.getC(),addnodes));
+						node1 = node1.getNextr();	// Then step both forward
 						node2 = node2.getNextr();
-						if(node2 == b.getRowhead()[i]){ // insert the rest of b if we've run out of a nodes
-							if(node.getNextr() == a.getRowhead()[i]){
-								break;
-							}
-							while(node.getNextr() != a.getRowhead()[i]){
-								sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
-								node = node.getNextr();
-							}
-							sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
-							break;
-						}
-					} else if(node.getC() < node2.getC()){ // if not aligned, it means that the respective node in the other matrix is 0 
-						sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
-						node = node.getNextr(); // traverse further on the row of the first matrix
-						if(node == a.getRowhead()[i]){ // insert the rest of b if we've run out of a nodes
-							while(node2.getNextr() != b.getRowhead()[i]){
-								sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
-								node2 = node2.getNextr();
-							}
-							sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
-							break;
-						}
-					} else if(node2.getC() < node.getC()){
+					} else if(node1.getC() < node2.getC()){ // if not aligned, it means that the respective node in the other matrix is 0 
+						sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
+						node1 = node1.getNextr(); // traverse further on the row of the first matrix
+					} else if(node2.getC() < node1.getC()){
 						sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
 						node2 = node2.getNextr(); // traverse further on the row of the second matrix
-						if(node2 == b.getRowhead()[i]){ // insert the rest of b if we've run out of a nodes
-							while(node.getNextr() != a.getRowhead()[i]){
-								sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
-								node = node.getNextr();
+					} 
+				}
+				// At this point at least one of the rows will be on its final element, we must
+				// figure out which one and then process the remaining values accordingly
+				
+				// If both are at the end check for same columns, if not add both to the sum matrix else add the sum
+				if(node1.getNextr() == a.getRowhead()[i] && node2.getNextr() == b.getRowhead()[i]){
+					if(node1.getC() == node2.getC()){
+						int addnodes = node1.getValue() + node2.getValue();
+						sum.insertNode(new Node(node1.getR(),node1.getC(),addnodes));
+					} else {
+						sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
+						sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+					}
+				} 
+				// If not both at end then check which one of the two is at the end and process the other list
+				else if (node1.getNextr() == a.getRowhead()[i]){	// a has ended first, process b
+					while(node2.getNextr() != b.getRowhead()[i]){
+						if(node1.getC() == node2.getC()){ // if the two nodes are aligned add and insert then dump rest of b
+							int addnodes = node1.getValue() + node2.getValue();
+							sum.insertNode(new Node(node1.getR(),node1.getC(),addnodes));
+							node2 = node2.getNextr();
+							while(node2 != b.getRowhead()[i]){
+								sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+								node2 = node2.getNextr(); 
 							}
-							sum.insertNode(new Node(node.getR(),node.getC(),node.getValue()));
+							break;
+/*stopped here for the night*/						} else if(node1.getC() < node2.getC()){	// if the 2nd node is already beyond the first insert a then dump the rest of b
+							sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
+							while(node2 != b.getRowhead()[i]){
+								sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+								node2 = node2.getNextr(); 
+							}
 							break;
 						}
-					} 
-				} while(node != a.getRowhead()[i] || node2 != b.getRowhead()[i]);
+						
+						
+						else {	// otherwise just add 
+							sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+							node2 = node2.getNextr(); // traverse further on the row of the second matrix
+						} 
+						node2 = node2.getNextr();
+					}
+				}
+				
+					
 			}	
 		}
 		return sum; // return sum matrix
