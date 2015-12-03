@@ -158,6 +158,7 @@ public class MatrixDriver {
 				} 
 				// If not both at end then check which one of the two is at the end and process the other list
 				else if (node1.getNextr() == a.getRowhead()[i]){	// a has ended first, process b
+					boolean ain = false;
 					while(node2.getNextr() != b.getRowhead()[i]){
 						if(node1.getC() == node2.getC()){ // if the two nodes are aligned add and insert then dump rest of b
 							int addnodes = node1.getValue() + node2.getValue();
@@ -167,26 +168,66 @@ public class MatrixDriver {
 								sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
 								node2 = node2.getNextr(); 
 							}
+							ain = true;
 							break;
-/*stopped here for the night*/						} else if(node1.getC() < node2.getC()){	// if the 2nd node is already beyond the first insert a then dump the rest of b
+						} else if(node2.getC() > node1.getC()){	// if the 2nd node is already beyond the first insert a then dump the rest of b
 							sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
 							while(node2 != b.getRowhead()[i]){
 								sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
 								node2 = node2.getNextr(); 
 							}
+							ain = true;
 							break;
-						}
-						
-						
-						else {	// otherwise just add 
+						} else {	// if node b is neither greater than or equal to node a, it must be less than so we add it and continue
 							sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
-							node2 = node2.getNextr(); // traverse further on the row of the second matrix
+							node2 = node2.getNextr(); 
 						} 
-						node2 = node2.getNextr();
+					}	// now deal with the final b node and a if it hasn't been inserted (both will be at the end)
+					if(node1.getC() == node2.getC()){ // if the two nodes are aligned add and insert then dump rest of b
+						int addnodes = node1.getValue() + node2.getValue();
+						sum.insertNode(new Node(node1.getR(),node1.getC(),addnodes));
+					} else {
+						if(!ain){
+							sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
+						}
+						sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+					}
+				} else {	// otherwise b has ended first so process a
+					boolean bin = false;
+					while(node1.getNextr() != a.getRowhead()[i]){
+						if(node2.getC() == node1.getC()){ // if the two nodes are aligned add and insert then dump rest of b
+							int addnodes = node2.getValue() + node1.getValue();
+							sum.insertNode(new Node(node2.getR(),node2.getC(),addnodes));
+							node1 = node1.getNextr();
+							while(node1 != a.getRowhead()[i]){
+								sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
+								node1 = node1.getNextr(); 
+							}
+							bin = true;
+							break;
+						} else if(node1.getC() > node2.getC()){	// if the 2nd node is already beyond the first insert a then dump the rest of b
+							sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+							while(node1 != a.getRowhead()[i]){
+								sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
+								node1 = node1.getNextr(); 
+							}
+							bin = true;
+							break;
+						} else {	// if node b is neither greater than or equal to node a, it must be less than so we add it and continue
+							sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
+							node1 = node1.getNextr(); 
+						} 
+					}	// now deal with the final b node and a if it hasn't been inserted (both will be at the end)
+					if(node2.getC() == node1.getC()){ // if the two nodes are aligned add and insert then dump rest of b
+						int addnodes = node2.getValue() + node1.getValue();
+						sum.insertNode(new Node(node2.getR(),node2.getC(),addnodes));
+					} else {
+						if(!bin){
+							sum.insertNode(new Node(node2.getR(),node2.getC(),node2.getValue()));
+						}
+						sum.insertNode(new Node(node1.getR(),node1.getC(),node1.getValue()));
 					}
 				}
-				
-					
 			}	
 		}
 		return sum; // return sum matrix
@@ -361,9 +402,10 @@ public class MatrixDriver {
 		System.out.println("Matrix B:");
 		System.out.println(b);
 		System.out.println("Matrix C:");
-		System.out.println(c);
+		System.out.println(c);	
 		System.out.println("Matrix D:");
 		System.out.println(d);
+
 
 		// Part II deliverables
 		Matrix e, f, g, h, i, j, k, l, m, n, o, p;
@@ -374,132 +416,133 @@ public class MatrixDriver {
 		System.out.println("Matrix F = D - C:");
 		f = subtract(d, c);
 		System.out.println(f);
+		System.out.println(add(d,scalarMultiply(-1, c)));
 
-		System.out.println("Matrix G = A + B:");
-		g = add(a, b);
-		System.out.println(g);
-
-		System.out.println("Matrix H = A - B:");
-		h = subtract(a, b);
-		System.out.println(h);
-
-		System.out.println("Matrix I = E - F:");
-		i = subtract(e, f);
-		System.out.println(i);
-
-		System.out.println("Matrix J = G + H:");
-		j = add(g, h);
-		System.out.println(j);
-
-		System.out.println("Matrix K = 5 * B:");
-		k = scalarMultiply(5, b);
-		System.out.println(k);
-
-		System.out.println("Matrix L = 8 * C:");
-		l = scalarMultiply(8, c);
-		System.out.println(l);
-
-		System.out.println("Matrix M = 3 * G:");
-		m = scalarMultiply(3, g);
-		System.out.println(m);
-
-		System.out.println("Matrix N = 2 * H:");
-		n = scalarMultiply(2, h);
-		System.out.println(n);
-
-		System.out.println("Matrix O = 2 * M:");
-		o = scalarMultiply(2, m);
-		System.out.println(o);
-
-		System.out.println("Matrix P = 3 * F:");
-		p = scalarMultiply(3, f);
-		System.out.println(p);
-
-		// Part III deliverables
-		Matrix q, r, s, t, u, v, w, x, y, z, aa, ab, ac, ad, ae, af, ag, ah, ai, aj;
-		System.out.println("Matrix Q = A * B:");
-		q = multiply(a, b);
-		System.out.println(q);
-
-		System.out.println("Matrix R = B * D:");
-		r = multiply(b, d);
-		System.out.println(r);
-
-		System.out.println("Matrix S = E * G:");
-		s = multiply(e, g);
-		System.out.println(s);
-
-		System.out.println("Matrix T = G * E:");
-		t = multiply(g, e);
-		System.out.println(t);
-
-		System.out.println("Matrix U = Q * H:");
-		u = multiply(q, h);
-		System.out.println(u);
-
-		System.out.println("Matrix V = S * T:");
-		v = multiply(s, t);
-		System.out.println(v);
-
-		System.out.println("Matrix W = R * S:");
-		w = multiply(r, s);
-		System.out.println(w);
-
-		System.out.println("Matrix X = D ^ 5:");
-		x = power(d, 5);
-		System.out.println(x);
-
-		System.out.println("Matrix Y = C ^ 8:");
-		y = power(c, 8);
-		System.out.println(y);
-
-		System.out.println("Matrix Z = B ^ 10:");
-		z = power(b, 10);
-		System.out.println(z);
-
-		System.out.println("Matrix AA = F ^ 2:");
-		aa = power(f, 2);
-		System.out.println(aa);
-		System.out.println(aa.toStringByCol());
-
-		System.out.println("Matrix AB = C ^ 3:");
-		ab = power(c, 3);
-		System.out.println(ab);
-
-		System.out.println("Matrix AC = A ^ 4:");
-		ac = power(a, 4);
-		System.out.println(ac);
-
-		System.out.println("Matrix AD = E ^ 3:");
-		ad = power(e, 3);
-		System.out.println(ad);
-
-		System.out.println("Matrix AE = F ^ T:");
-		ae = transpose(f);
-		System.out.println(ae);
-
-		System.out.println("Matrix AF = E ^ T:");
-		af = transpose(e);
-		System.out.println(af);
-
-		System.out.println("Matrix AG = V ^ T:");
-		ag = transpose(v);
-		System.out.println(ag);
-
-		System.out.println("Matrix AH = L ^ T:");
-		ah = transpose(l);
-		System.out.println(ah);
-
-		System.out.println("Matrix AI = ((A + B) ^ T) - (A ^ T) - (B ^ T):");
-		ai = subtract(subtract(transpose(add(a, b)), transpose(a)), transpose(b));
-		System.out.println(ai);
-
-		System.out.println("Matrix AJ = ((A * B) ^ T) - ((B ^ T) * (A ^ T)):");
-		aj = subtract(transpose(multiply(a,b)), multiply(transpose(b), transpose(a)));
-		System.out.println(aj);
-
-		initializeByInput();
-		System.out.println(a);
+//		System.out.println("Matrix G = A + B:");
+//		g = add(a, b);
+//		System.out.println(g);
+//
+//		System.out.println("Matrix H = A - B:");
+//		h = subtract(a, b);
+//		System.out.println(h);
+//
+//		System.out.println("Matrix I = E - F:");
+//		i = subtract(e, f);
+//		System.out.println(i);
+//
+//		System.out.println("Matrix J = G + H:");
+//		j = add(g, h);
+//		System.out.println(j);
+//
+//		System.out.println("Matrix K = 5 * B:");
+//		k = scalarMultiply(5, b);
+//		System.out.println(k);
+//
+//		System.out.println("Matrix L = 8 * C:");
+//		l = scalarMultiply(8, c);
+//		System.out.println(l);
+//
+//		System.out.println("Matrix M = 3 * G:");
+//		m = scalarMultiply(3, g);
+//		System.out.println(m);
+//
+//		System.out.println("Matrix N = 2 * H:");
+//		n = scalarMultiply(2, h);
+//		System.out.println(n);
+//
+//		System.out.println("Matrix O = 2 * M:");
+//		o = scalarMultiply(2, m);
+//		System.out.println(o);
+//
+//		System.out.println("Matrix P = 3 * F:");
+//		p = scalarMultiply(3, f);
+//		System.out.println(p);
+//
+//		// Part III deliverables
+//		Matrix q, r, s, t, u, v, w, x, y, z, aa, ab, ac, ad, ae, af, ag, ah, ai, aj;
+//		System.out.println("Matrix Q = A * B:");
+//		q = multiply(a, b);
+//		System.out.println(q);
+//
+//		System.out.println("Matrix R = B * D:");
+//		r = multiply(b, d);
+//		System.out.println(r);
+//
+//		System.out.println("Matrix S = E * G:");
+//		s = multiply(e, g);
+//		System.out.println(s);
+//
+//		System.out.println("Matrix T = G * E:");
+//		t = multiply(g, e);
+//		System.out.println(t);
+//
+//		System.out.println("Matrix U = Q * H:");
+//		u = multiply(q, h);
+//		System.out.println(u);
+//
+//		System.out.println("Matrix V = S * T:");
+//		v = multiply(s, t);
+//		System.out.println(v);
+//
+//		System.out.println("Matrix W = R * S:");
+//		w = multiply(r, s);
+//		System.out.println(w);
+//
+//		System.out.println("Matrix X = D ^ 5:");
+//		x = power(d, 5);
+//		System.out.println(x);
+//
+//		System.out.println("Matrix Y = C ^ 8:");
+//		y = power(c, 8);
+//		System.out.println(y);
+//
+//		System.out.println("Matrix Z = B ^ 10:");
+//		z = power(b, 10);
+//		System.out.println(z);
+//
+//		System.out.println("Matrix AA = F ^ 2:");
+//		aa = power(f, 2);
+//		System.out.println(aa);
+//		System.out.println(aa.toStringByCol());
+//
+//		System.out.println("Matrix AB = C ^ 3:");
+//		ab = power(c, 3);
+//		System.out.println(ab);
+//
+//		System.out.println("Matrix AC = A ^ 4:");
+//		ac = power(a, 4);
+//		System.out.println(ac);
+//
+//		System.out.println("Matrix AD = E ^ 3:");
+//		ad = power(e, 3);
+//		System.out.println(ad);
+//
+//		System.out.println("Matrix AE = F ^ T:");
+//		ae = transpose(f);
+//		System.out.println(ae);
+//
+//		System.out.println("Matrix AF = E ^ T:");
+//		af = transpose(e);
+//		System.out.println(af);
+//
+//		System.out.println("Matrix AG = V ^ T:");
+//		ag = transpose(v);
+//		System.out.println(ag);
+//
+//		System.out.println("Matrix AH = L ^ T:");
+//		ah = transpose(l);
+//		System.out.println(ah);
+//
+//		System.out.println("Matrix AI = ((A + B) ^ T) - (A ^ T) - (B ^ T):");
+//		ai = subtract(subtract(transpose(add(a, b)), transpose(a)), transpose(b));
+//		System.out.println(ai);
+//
+//		System.out.println("Matrix AJ = ((A * B) ^ T) - ((B ^ T) * (A ^ T)):");
+//		aj = subtract(transpose(multiply(a,b)), multiply(transpose(b), transpose(a)));
+//		System.out.println(aj);
+//
+//		initializeByInput();
+//		System.out.println(a);
 	}
 
 	public static void printList(Matrix a){
